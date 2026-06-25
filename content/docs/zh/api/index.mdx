@@ -1,0 +1,100 @@
+---
+title: API 参考
+description: 天下同网 完整接口文档
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import {
+  List,
+  MessageSquare,
+  FileText,
+  Database,
+  Search,
+  ShieldCheck,
+  Headphones,
+  Radio,
+  Image,
+  Video,
+  FileQuestion,
+} from 'lucide-react';
+
+## 概述
+
+天下同网 提供完整的 RESTful API 接口，可通过这些接口实现 AI 能力调用。
+
+<Callout title="在线调试">
+  您可以访问 [Apifox 操练场](https://docs.txtoken.cn/) 在线测试和调试 API 接口，或浏览下方的 API 文档。
+</Callout>
+
+## AI 模型接口
+
+AI 模型接口提供各种 AI 能力的调用，兼容 OpenAI API 格式。
+
+<Cards>
+  <Card
+    icon={<List />}
+    title="模型列表"
+    description="获取可用的模型列表。"
+    href="/docs/api/ai-model/models/list/listmodels"
+  />
+  <Card
+    icon={<MessageSquare />}
+    title="聊天"
+    description="对话补全接口。"
+    href="/docs/api/ai-model/chat/openai/createchatcompletion"
+  />
+  <Card
+    icon={<FileText />}
+    title="补全"
+    description="传统文本补全接口。"
+    href="/docs/api/ai-model/completions/createcompletion"
+  />
+  <Card
+    icon={<Database />}
+    title="嵌入"
+    description="文本嵌入向量生成接口。"
+    href="/docs/api/ai-model/embeddings/createembedding"
+  />
+  <Card
+    icon={<Search />}
+    title="重排序"
+    description="文档重排序接口。"
+    href="/docs/api/ai-model/rerank/creatererank"
+  />
+  <Card
+    icon={<ShieldCheck />}
+    title="审查"
+    description="内容安全审核接口。内容安全审核接口是合规工具之一，不替代部署方自身安全治理义务和上游内容政策要求。面向公众服务应建立滥用举报、日志审计和处置机制。"
+    href="/docs/api/ai-model/moderations/createmoderation"
+  />
+  <Card
+    icon={<Headphones />}
+    title="音频"
+    description="语音识别和语音合成接口。"
+    href="/docs/api/ai-model/audio/openai/createspeech"
+  />
+  <Card
+    icon={<Radio />}
+    title="实时语音"
+    description="实时音频流接口。"
+    href="/docs/api/ai-model/realtime/createrealtimesession"
+  />
+  <Card
+    icon={<Image />}
+    title="图像"
+    description="AI图像生成接口。"
+    href="/docs/api/ai-model/images/openai/post-v1-images-generations"
+  />
+  <Card
+    icon={<Video />}
+    title="视频"
+    description="AI视频生成接口。"
+    href="/docs/api/ai-model/videos/sora/createvideo"
+  />
+  <Card
+    icon={<FileQuestion />}
+    title="未实现"
+    description="占位接口，暂未实现。"
+    href="/docs/api/ai-model/unimplemented/files/listfiles"
+  />
+</Cards>

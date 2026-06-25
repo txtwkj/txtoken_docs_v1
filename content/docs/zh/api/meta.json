@@ -1,0 +1,6 @@
+{
+  "title": "API 参考",
+  "description": "天下同网 接口文档",
+  "icon": "Code",
+  "pages": ["index", "ai-model"]
+}

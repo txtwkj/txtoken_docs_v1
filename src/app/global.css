@@ -1,0 +1,92 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
+@plugin 'tailwindcss-animate';
+
+@theme {
+  --spacing-fd-container: 1436px;
+
+  /* Yellow-Blue brand palette */
+  --color-brand: hsl(220, 80%, 50%);
+  --color-brand-foreground: white;
+  --color-brand-secondary: hsl(45, 95%, 55%);
+  --color-brand-secondary-foreground: hsl(220, 60%, 15%);
+  --color-brand-200: hsl(220, 70%, 75%);
+
+  /* Fumadocs UI theme color (for navigation, TOC, etc.) */
+  --color-fd-primary: hsl(220, 80%, 50%);
+  --color-fd-primary-foreground: white;
+
+  --color-landing-foreground: #1a3a6a;
+  --color-landing-foreground-200: #4a6a9a;
+
+  /* System fonts */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
+}
+
+.dark {
+  --color-landing-foreground: #d8e6ff;
+  --color-landing-foreground-200: #a8c0e8;
+
+  /* Yellow-Blue brand palette (dark mode) */
+  --color-brand: hsl(220, 85%, 65%);
+  --color-brand-secondary: hsl(45, 95%, 60%);
+  --color-brand-secondary-foreground: hsl(220, 60%, 10%);
+  --color-brand-foreground: black;
+  --color-brand-200: hsl(220, 80%, 85%);
+
+  /* Fumadocs UI theme color (for navigation, TOC, etc. - dark mode) */
+  --color-fd-primary: hsl(220, 85%, 65%);
+  --color-fd-primary-foreground: black;
+}
+
+@theme inline {
+  --default-mono-font-family: var(--font-mono);
+}
+
+body {
+  overscroll-behavior-y: none;
+  background-color: var(--color-fd-background);
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
+}
+
+/* Homepage card enhanced styles */
+[data-card] {
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-card]:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-brand);
+}
+
+/* Card icon container enhancement */
+[data-card] > div:first-child {
+  transition: all 0.3s ease;
+}
+
+[data-card]:hover > div:first-child {
+  transform: scale(1.1);
+  background-color: var(--color-brand);
+  color: var(--color-brand-foreground);
+}
+
+/* Cards grid layout optimization */
+.prose
+  :where([data-card]):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  ) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
