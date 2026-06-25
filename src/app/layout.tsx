@@ -41,9 +41,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="zh">
+    <html suppressHydrationWarning className="dark" lang="zh">
       <head>
         <meta charSet="utf-8" />
+        <script
+          // Force dark theme before hydration to avoid white-flash.
+          dangerouslySetInnerHTML={{
+            __html: "try { localStorage.setItem('theme', 'dark'); } catch (e) {}",
+          }}
+        />
       </head>
       <body>
         <Provider locale={{ locale: 'zh', translations: zhTranslations }}>

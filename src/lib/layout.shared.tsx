@@ -1,18 +1,17 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import Image from 'next/image';
 import type { LinkItemType } from 'fumadocs-ui/layouts/docs';
 
 export const linkItems: LinkItemType[] = [];
 
 export const logo = (
-  <Image
+  // Plain <img> avoids next/image basePath quirks in static export.
+  // eslint-disable-next-line @next/next/no-img-element
+  <img
+    src="/txtoken_docs_v1/txtw_logo.png"
     alt="天下同网"
-    src="/txtw_logo.png"
-    width={20}
-    height={20}
-    className="size-8"
-    priority
-    unoptimized
+    width={32}
+    height={32}
+    className="size-8 rounded"
   />
 );
 

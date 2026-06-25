@@ -10,7 +10,10 @@ interface ProviderProps {
 
 export function Provider({ children, locale }: ProviderProps) {
   return (
-    <RootProvider i18n={locale ? { locale: locale.locale, translations: locale.translations } : undefined}>
+    <RootProvider
+      i18n={locale ? { locale: locale.locale, translations: locale.translations } : undefined}
+      theme={{ defaultTheme: 'dark', enableSystem: false }}
+    >
       {children}
     </RootProvider>
   );
