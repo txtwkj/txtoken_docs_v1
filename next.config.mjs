@@ -6,21 +6,12 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  experimental: {
-    serverActions: {
-      allowedOrigins: [
-        'localhost:3000',
-        // 天下同网部署域名（newapi.pro / newapi.ai 实际托管）
-        'docs.newapi.pro',
-        'newapi.pro',
-        'www.newapi.pro',
-        'docs.newapi.ai',
-        'newapi.ai',
-        'www.newapi.ai',
-        // Vercel preview
-        'new-api-docs-v1.vercel.app',
-      ],
-    },
+  // GitHub Pages static export.
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    // Static export requires unoptimized images.
+    unoptimized: true,
   },
   async headers() {
     return [
