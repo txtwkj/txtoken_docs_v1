@@ -29,3 +29,6 @@ yarn-error.log*
 .vercel
 next-env.d.ts
 .idea/_backup/
+
+# Local backup (excluded content from project)
+_backup/

@@ -8,6 +8,11 @@ const config = {
   poweredByHeader: false,
   // GitHub Pages static export.
   output: 'export',
+  // Project page: https://<user>.github.io/<repo>/
+  // For a user-site (repo renamed to <user>.github.io), set
+  // GITHUB_PAGES_BASE_PATH='' in the workflow env to override.
+  basePath: process.env.GITHUB_PAGES_BASE_PATH || '/txtoken_docs_v1',
+  assetPrefix: process.env.GITHUB_PAGES_BASE_PATH || '/txtoken_docs_v1',
   trailingSlash: true,
   images: {
     // Static export requires unoptimized images.
