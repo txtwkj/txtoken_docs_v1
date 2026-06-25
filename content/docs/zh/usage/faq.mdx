@@ -1,0 +1,46 @@
+---
+title: 常见问题 FAQ
+description: 常见错误与解决方案
+---
+
+### Q1：401 错误？
+
+- 确认 Key 含 `sk-` 前缀且未过期
+- 指定渠道时格式为 `sk-<密钥>-<渠道ID>`，密钥主体不宜含多余 `-`
+
+### Q2：403 模型不可用？
+
+Key 可能配置了模型白名单，请联系管理员开通对应模型（如 `gpt-image-2`、`doubao-seedance-2-0-260128`）。
+
+### Q3：429 限流？
+
+- 降低并发（尤其 gpt-image-2 `quality=high`、Gemini 4K、Seedance 视频）
+- 增加请求间隔与 HTTP 超时
+
+### Q4：图片接口 400 `unknown_parameter`？
+
+多数网关**不支持** `response_format`，请从请求体移除；Gemini 勿传 `imageOutputOptions` 除非渠道明确支持。
+
+### Q5：gpt-image-2 传 `background: transparent` 失败？
+
+**gpt-image-2 不支持透明背景**，请使用 `opaque` 或 `auto`，输出格式选 `png`/`webp`。
+
+### Q6：Gemini 生图长时间无响应？
+
+4K 非流式请求正常需**数分钟**；请勿用短超时。多路并发易 429，建议 `--concurrency` ≤ 2–3。
+
+### Q7：Seedance 返回 InvalidParameter？
+
+检查是否混用了首帧、首尾帧、多模态参考三种场景；`video_url` 必须为 `{"url":"..."}` 对象。
+
+### Q8：Seedance 涉及真人/私域人像，如何接入？
+
+须先由管理员在火山方舟侧创建**私域虚拟人像素材资产库**并下发**资产库 ID**；用户按私域虚拟人像素材资产库使用指南完成**人物审核**后，再使用已通过审核的**资产 ID** 调用 `POST /v1/videos`。详见 [§6.2.0 真人形象审核](/docs/usage/media-api#620-真人形象审核与资产库合规前置)。
+
+### Q9：如何获取每次调用的 Token 消耗？
+
+成功响应中的 `usage` 字段；视频/图片任务完成后查询接口亦可能返回 `usage`。
+
+### Q10：员工没有控制台账号，如何使用 API？
+
+由企业管理员在 **令牌** 页创建 Key 并分发即可。员工只需 `Base URL` + `sk-xxx`，无需注册登录。若需每人独立额度与审计，可为每位成员单独开户，或由管理员按人创建不同名称、额度与 IP 限制的令牌。

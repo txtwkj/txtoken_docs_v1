@@ -1,0 +1,19 @@
+{
+  "title": "使用说明",
+  "icon": "BookOpen",
+  "pages": [
+    "index",
+    "account-tokens",
+    "quickstart",
+    "authentication",
+    "openai-api",
+    "native-api",
+    "media-api",
+    "streaming",
+    "error-codes",
+    "sdk",
+    "integrations",
+    "faq",
+    "appendix"
+  ]
+}

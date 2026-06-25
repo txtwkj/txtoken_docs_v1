@@ -5,7 +5,7 @@ import {
   DocsPage,
   DocsTitle,
 } from 'fumadocs-ui/page';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
 import { LLMCopyButton, ViewOptions } from '@/components/page-actions';
@@ -15,8 +15,8 @@ const owner = 'QuantumNous';
 const repo = 'txtoken-docs-v1';
 const branch = 'main';
 
-const ALLOWED_EXACT = new Set(['api/index']);
-const ALLOWED_PREFIXES = ['api/ai-model/'];
+const ALLOWED_EXACT = new Set(['api/index', 'usage/index']);
+const ALLOWED_PREFIXES = ['api/ai-model/', 'api/management/', 'usage/'];
 
 function isAllowed(path: string): boolean {
   // path examples: 'api/index.mdx', 'api/ai-model/chat/openai/foo.mdx'
@@ -32,7 +32,8 @@ export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
 }) {
   const { slug } = await props.params;
-  const slugs = slug ?? [];
+  if (!slug || slug.length === 0) redirect('/docs/usage');
+  const slugs = slug;
   const page = source.getPage(slugs);
   if (!page) notFound();
   if (!isAllowed(page.path)) notFound();
@@ -72,7 +73,12 @@ export default async function Page(props: {
 }
 
 export async function generateStaticParams() {
-  return source.generateParams();
+  return source.generateParams().filter((param) => {
+    const slugs = param.slug ?? [];
+    const page = source.getPage(slugs);
+    if (!page) return false;
+    return isAllowed(page.path);
+  });
 }
 
 export async function generateMetadata(props: {

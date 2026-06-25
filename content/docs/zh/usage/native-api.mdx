@@ -1,0 +1,43 @@
+---
+title: 原生协议兼容接口
+description: Claude Messages API 与 Gemini generateContent API
+---
+
+## 5.1 Claude Messages API
+
+**端点：** `POST /v1/messages`
+
+**必需请求头：**
+
+- `x-api-key: sk-xxxxxxxxxxxx`
+- `anthropic-version: 2023-06-01`
+- `Content-Type: application/json`
+
+**请求示例：**
+
+```bash
+curl http://<平台地址>/v1/messages \
+  -H "x-api-key: sk-xxxxxxxxxxxx" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-20250514",
+    "max_tokens": 1024,
+    "messages": [
+      {"role": "user", "content": "用 Python 写一个快速排序"}
+    ]
+  }'
+```
+
+## 5.2 Gemini generateContent API
+
+**非流式端点：** `POST /v1beta/models/{model}:generateContent`
+
+**流式端点：** `POST /v1beta/models/{model}:streamGenerateContent?alt=sse`
+
+**认证方式（两选其一）：**
+
+- 请求头：`Authorization: Bearer sk-xxxxxxxxxxxx`
+- URL 参数：`?key=sk-xxxxxxxxxxxx`
+
+Gemini 图片生成参数详见[核心接口 §4.3.4](/docs/usage/openai-api#434-gemini-图片生成)。

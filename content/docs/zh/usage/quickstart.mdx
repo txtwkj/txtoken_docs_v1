@@ -1,0 +1,53 @@
+---
+title: 快速开始
+description: 发起第一个 API 请求
+---
+
+## 2.1 记住两个关键信息
+
+| 项目 | 值 | 说明 |
+|------|-----|------|
+| **Base URL** | `http://<平台地址>` | 所有 API 请求的根地址，由管理员提供 |
+| **API Key** | `sk-xxxxxxxxxxxx` | 您的专属密钥；由管理员创建后分发，创建方法见 [账号注册与令牌管理](/docs/usage/account-tokens) |
+
+可选：固定走某一上游渠道时，Authorization 可使用 `Bearer sk-<密钥>-<渠道ID>`（以平台运营配置为准）。
+
+## 2.2 发起第一个请求
+
+```bash
+curl http://<平台地址>/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "user", "content": "你好，请用一句话介绍你自己"}
+    ]
+  }'
+```
+
+**响应示例：**
+
+```json
+{
+  "id": "chatcmpl-abc123",
+  "object": "chat.completion",
+  "created": 1711000000,
+  "model": "gpt-4o-mini",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "你好！我是一个 AI 语言模型助手，可以回答问题、撰写文本和提供各种帮助。"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 15,
+    "completion_tokens": 28,
+    "total_tokens": 43
+  }
+}
+```

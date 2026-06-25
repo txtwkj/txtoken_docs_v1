@@ -1,0 +1,33 @@
+---
+title: 附录：接口速查表
+description: 全部接口路径汇总
+---
+
+## A. 核心 AI 接口
+
+| 功能 | 方法 | 路径 | 流式 |
+|------|------|------|------|
+| 对话补全 | POST | `/v1/chat/completions` | SSE |
+| 文本补全 | POST | `/v1/completions` | SSE |
+| 图片生成 | POST | `/v1/images/generations` | — |
+| 图片编辑 | POST | `/v1/images/edits` | — |
+| Responses | POST | `/v1/responses` | SSE |
+
+## B. 原生协议
+
+| 功能 | 方法 | 路径 |
+|------|------|------|
+| Claude 对话 | POST | `/v1/messages` |
+| Gemini 生成 | POST | `/v1beta/models/{model}:generateContent` |
+| Gemini 流式 | POST | `/v1beta/models/{model}:streamGenerateContent?alt=sse` |
+
+## C. 多媒体
+
+| 功能 | 方法 | 路径 |
+|------|------|------|
+| 视频创建 | POST | `/v1/videos` |
+| 视频查询 | GET | `/v1/videos/{task_id}` |
+| 可灵文生视频 | POST | `/kling/v1/videos/text2video` |
+| 可灵图生视频 | POST | `/kling/v1/videos/image2video` |
+| MJ 绘图 | POST | `/mj/submit/imagine` |
+| Suno 创作 | POST | `/suno/submit/:action` |

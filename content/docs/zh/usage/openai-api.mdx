@@ -1,0 +1,358 @@
+---
+title: 核心接口（OpenAI 兼容）
+description: 对话补全、文本补全、图片生成、Responses API
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 4.1 对话补全（Chat Completions）
+
+最常用的接口，支持多轮对话。
+
+```
+POST /v1/chat/completions
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `model` | string | 是 | 模型名称，如 `gpt-4o`、`gpt-5.4`、`deepseek-chat`、`claude-opus-4.6`（以控制台为准） |
+| `messages` | array | 是 | 对话消息数组，每条包含 `role`（system/user/assistant）和 `content` |
+| `stream` | boolean | 否 | 是否启用流式响应，默认 `false` |
+| `max_tokens` | integer | 否 | 最大生成 token 数（部分旧模型/SDK 仍使用该字段） |
+| `max_completion_tokens` | integer | 否 | 最大生成 token 数（OpenAI 新版推荐字段；与 `max_tokens` 二选一或按上游约定） |
+| `stream_options` | object | 否 | 流式专用选项；常见 `{"include_usage": true}`，便于在流末获得 `usage` |
+| `temperature` | float | 否 | 采样温度，0–2 之间，越高越随机 |
+| `top_p` | float | 否 | 核采样参数 |
+
+**curl 示例：**
+
+```bash
+curl http://<平台地址>/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {"role": "system", "content": "你是一个专业的技术顾问"},
+      {"role": "user", "content": "请解释什么是 RESTful API"}
+    ],
+    "temperature": 0.7,
+    "max_tokens": 500
+  }'
+```
+
+**流式请求示例：**
+
+```bash
+curl -N http://<平台地址>/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "写一首五言绝句"}],
+    "max_completion_tokens": 512,
+    "stream": true,
+    "stream_options": {"include_usage": true}
+  }'
+```
+
+流式响应格式参见[流式响应（SSE）说明](/docs/usage/streaming)。
+
+## 4.2 文本补全（Completions）
+
+传统补全接口，基于提示文本续写。
+
+```
+POST /v1/completions
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `model` | string | 是 | 模型名称 |
+| `prompt` | string | 是 | 提示文本 |
+| `stream` | boolean | 否 | 是否流式 |
+| `max_tokens` | integer | 否 | 最大生成数 |
+
+## 4.3 图片生成（Images）
+
+平台支持三类主流生图路径：
+
+| 类型 | 模型示例 | 推荐接口 |
+|------|---------|---------|
+| OpenAI 兼容生图 | `gpt-image-1.5`、`gpt-image-2` | `POST /v1/images/generations`、`POST /v1/images/edits` |
+| Gemini 原生生图 | `gemini-3.1-flash-image-preview` 等 | `POST /v1beta/models/{model}:generateContent` |
+| Gemini Chat 生图 | 同上 | `POST /v1/chat/completions` |
+
+### 4.3.1 通用：`POST /v1/images/generations`
+
+文生图（JSON 请求体）。
+
+| 参数 | 类型 | 必填 | 候选值 / 说明 |
+|------|------|------|---------|
+| `model` | string | 是 | 如 `gpt-image-1.5`、`gpt-image-2`、`dall-e-3` |
+| `prompt` | string | 是 | 图片描述 |
+| `n` | integer | 否 | 生成张数，默认 `1`；`gpt-image-2` 常见上限 **10** |
+| `size` | string | 否 | 见各模型小节 |
+| `quality` | string | 否 | `gpt-image-2`：`low` / `medium` / `high` / `auto`（默认 `auto`） |
+| `background` | string | 否 | `transparent` / `opaque` / `auto`；`gpt-image-2` 当前不支持 `transparent` |
+| `output_format` | string | 否 | `gpt-image-2`：`png` / `jpeg` / `webp`（默认 `png`） |
+| `output_compression` | integer | 否 | `gpt-image-2`：`0`–`100`，仅 `jpeg` / `webp` 生效 |
+| `moderation` | string | 否 | `gpt-image-2`：`auto` / `low`（降低过滤严格度） |
+| `user` | string | 否 | 终端用户稳定 ID，便于滥用监测 |
+| `response_format` | string | 否 | `url` / `b64_json`；多数聚合网关不支持该字段，传参可能返回 `unknown_parameter`，默认不传 |
+
+**响应说明：**
+
+- 成功时返回 `data[]`，每项含 `url` 和/或 `b64_json`
+- 若仅有 `url`，客户端需 GET 下载后保存
+- 单次 `quality=high` + 大分辨率（如 4K）可能耗时**数分钟**，请设置足够超时
+
+**保存图片建议：**
+
+1. 优先解析 `data[].b64_json` 解码落盘
+2. 若无 `b64_json`，对 `data[].url` 发起 GET 下载
+3. 仅在上游明确支持时再传 `response_format: "b64_json"`
+
+### 4.3.2 gpt-image-1.5
+
+OpenAI 兼容文生图模型，通过 `POST /v1/images/generations` 调用。
+
+| 参数 | 类型 | 必填 | 候选值 | 说明 |
+|------|------|------|--------|------|
+| `model` | string | 是 | `gpt-image-1.5` | 固定模型 ID |
+| `prompt` | string | 是 | — | 英文/中文描述均可 |
+| `n` | integer | 否 | ≥1 | 生成张数，默认 `1` |
+| `size` | string | 否 | 如 `1024x1024` | 常用 `1024x1024`；具体以渠道白名单为准 |
+| `background` | string | 否 | `transparent` / `opaque` / `auto` | 背景模式；默认常用 `transparent` |
+
+```bash
+curl http://<平台地址>/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-image-1.5",
+    "prompt": "A cute baby sea otter floating on calm water",
+    "n": 1,
+    "size": "1024x1024",
+    "background": "transparent"
+  }'
+```
+
+<Callout type="warn">
+- 默认**不要**传 `response_format`；顶点等代理网关常报 `unknown_parameter`
+- 需要指定渠道：`Authorization: Bearer sk-<密钥>-<渠道ID>`
+</Callout>
+
+### 4.3.3 gpt-image-2
+
+OpenAI 新一代图像模型，支持**高分辨率文生图**与**图生图/局部编辑**。
+
+#### 文生图
+
+```
+POST /v1/images/generations
+```
+
+| 参数 | 类型 | 必填 | 候选值 | 说明 |
+|------|------|------|--------|------|
+| `model` | string | 是 | `gpt-image-2`、`gpt-image-2-2026-04-21` 等 | 可使用显式 snapshot 名 |
+| `prompt` | string | 是 | — | 图片描述 |
+| `n` | integer | 否 | 1–10 | 每请求生成张数 |
+| `size` | string | 否 | 见下表 | `auto` 或由模型自选；亦支持自定义 `WxH` |
+| `quality` | string | 否 | `low` / `medium` / `high` / `auto` | 质量档位；`high` 时延显著增加 |
+| `background` | string | 否 | `opaque` / `auto` | `transparent` 不被 gpt-image-2 支持 |
+| `output_format` | string | 否 | `png` / `jpeg` / `webp` | 默认 `png` |
+| `output_compression` | integer | 否 | 0–100 | 仅 `jpeg` / `webp` |
+| `moderation` | string | 否 | `auto` / `low` | 内容过滤严格度 |
+
+**size 约束（gpt-image-2）：**
+
+- 最长边 ≤ **3840** px
+- 宽、高均为 **16** 的倍数
+- 长短边比 ≤ **3:1**
+- 总像素 ∈ **[655 360, 8 294 400]**
+- 超过约 **2560×1440**（2K+）官方标注为**实验性**，耗时可显著增加
+
+**常用 `size` 示例：**
+
+| size | 说明 |
+|------|------|
+| `1024x1024` | 方形 |
+| `1536x1024` | 横版 |
+| `1024x1536` | 竖版 |
+| `2048x2048` | 2K 方形 |
+| `3840x2160` | 4K 横版 |
+| `2160x3840` | 4K 竖版 |
+| `auto` | 模型自选 |
+
+```bash
+curl http://<平台地址>/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gpt-image-2",
+    "prompt": "赛博朋克风格的城市夜景，霓虹灯倒映在雨后街道",
+    "n": 1,
+    "size": "1024x1024",
+    "quality": "high",
+    "output_format": "png"
+  }'
+```
+
+#### 图生图 / 局部编辑
+
+```
+POST /v1/images/edits
+Content-Type: multipart/form-data
+```
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `model` | string | 是 | `gpt-image-2` |
+| `prompt` | string | 是 | 编辑描述 |
+| `image` | file | 是 | 参考/原图；可传多张（字段名 `image[]` 或重复 `image`） |
+| `mask` | file | 否 | 透明区域蒙版（PNG），仅编辑蒙版区域 |
+| `size` / `quality` / `output_format` 等 | — | 否 | 与文生图相同 |
+
+```bash
+curl http://<平台地址>/v1/images/edits \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -F "model=gpt-image-2" \
+  -F "prompt=在画面中加入一只橘猫，保持原有光线与构图" \
+  -F "image=@./room.png" \
+  -F "size=1024x1024" \
+  -F "quality=high"
+```
+
+<Callout type="warn">
+**并发与限流：** 多路并发 + `quality=high` 易触发上游 **429** / `rate_limit_exceeded`。建议控制并发、错峰提交，单请求超时建议 **300s** 以上（4K 场景可更长）。
+</Callout>
+
+### 4.3.4 Gemini 图片生成
+
+Gemini 生图模型（如 `gemini-3.1-flash-image-preview`、`gemini-3-pro-image-preview`）**不支持** `/v1/images/generations`，须走 **Chat Completions** 或 **Gemini 原生 generateContent**。
+
+#### 方式一：OpenAI 兼容 Chat（简便）
+
+```
+POST /v1/chat/completions
+```
+
+平台会为支持生图的 Gemini 模型注入 `responseModalities`。建议 `max_tokens` 设为 **4096–8192**（图片 inline 数据较大）。
+
+```bash
+curl http://<平台地址>/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "gemini-3.1-flash-image-preview",
+    "messages": [
+      {"role": "user", "content": "请画一只可爱的水獭宝宝在海面上漂浮"}
+    ],
+    "max_tokens": 8192
+  }'
+```
+
+响应 `content` 中可能含 markdown 内嵌图：`![image](data:image/png;base64,...)`，需自行解析 data URL。
+
+#### 方式二：Gemini 原生 generateContent（推荐，参数最全）
+
+```
+POST /v1beta/models/{model}:generateContent
+```
+
+| 字段 | 类型 | 必填 | 候选值 | 说明 |
+|------|------|------|--------|------|
+| `contents[].role` | string | 是 | `user` | 用户轮次 |
+| `contents[].parts[].text` | string | 是* | — | 文本提示词 |
+| `contents[].parts[].inlineData` | object | 否 | `mimeType` + `data`(base64) | 参考图（图生图/风格参考） |
+| `generationConfig.responseModalities` | array | 否 | `TEXT`、`IMAGE` 或 `["TEXT","IMAGE"]` | 输出模态；纯出图可设 `["IMAGE"]` |
+| `generationConfig.imageConfig.imageSize` | string | 否 | `1K` / `2K` / `4K` | 输出分辨率档位；4K 单请求常需数分钟 |
+| `generationConfig.imageConfig.aspectRatio` | string | 否 | `1:1`、`16:9`、`9:16` 等 | 画幅比例 |
+| `generationConfig.imageMimeType` | string | 否 | `image/png`、`image/jpeg` 等 | 期望输出 MIME（是否生效取决于上游） |
+| `generationConfig.thinkingConfig.thinkingLevel` | string | 否 | `minimal` / `high` | **Gemini 3.1 Flash Image**：`minimal`=默认低延迟；`high`=更强思考、更高延迟 |
+| `generationConfig.thinkingConfig.includeThoughts` | boolean | 否 | `true` / `false` | 是否在响应中返回思考过程 |
+| `generationConfig.maxOutputTokens` | integer | 否 | 如 `8192` | 最大输出 token |
+
+<Callout type="warn">
+`generationConfig.imageConfig.imageOutputOptions` 多数经网关转发的 Gemini 上游**已不支持**（会 400 Unknown name），默认勿传。
+</Callout>
+
+**文生图 curl 示例（4K）：**
+
+```bash
+curl "http://<平台地址>/v1beta/models/gemini-3.1-flash-image-preview:generateContent" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "contents": [{
+      "role": "user",
+      "parts": [{"text": "小猫玩耍，卡通风格，明亮色彩"}]
+    }],
+    "generationConfig": {
+      "responseModalities": ["TEXT", "IMAGE"],
+      "imageConfig": {
+        "imageSize": "4K",
+        "aspectRatio": "1:1"
+      },
+      "maxOutputTokens": 8192
+    }
+  }'
+```
+
+**带参考图（inlineData）：**
+
+```bash
+curl "http://<平台地址>/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "contents": [{
+      "role": "user",
+      "parts": [
+        {"inlineData": {"mimeType": "image/png", "data": "<BASE64>"}},
+        {"text": "参考上图风格，生成一张夜景海报"}
+      ]
+    }],
+    "generationConfig": {
+      "responseModalities": ["IMAGE"],
+      "imageConfig": {"imageSize": "2K", "aspectRatio": "16:9"}
+    }
+  }'
+```
+
+**响应解析：**
+
+成功时 `candidates[0].content.parts[]` 含：
+
+- `{"text": "..."}` — 文本说明
+- `{"inlineData": {"mimeType": "image/png", "data": "<BASE64>"}}` — 图片
+
+同一响应若含多张 `inlineData`（如先小图后大图），取**解码后体积最大**的一张通常为最终成片。
+
+**支持的 Gemini 生图模型（示例）：**
+
+| 模型 | 说明 |
+|------|------|
+| `gemini-3.1-flash-image-preview` | 速度快，支持 `thinkingLevel` |
+| `gemini-3-pro-image-preview` | 质量高 |
+| `gemini-2.5-flash-image` | 2.5 Flash 图片版 |
+| `gemini-2.0-flash-exp-image-generation` | 2.0 实验版 |
+
+<Callout type="info">
+**Gemini 生图注意：**
+- 非流式 `generateContent` 需等待**整包**返回；4K + 多路并发常见 **5–10+ 分钟**
+- 并发过高易 **429 Resource exhausted**，请降低并发或错峰
+- 流式 Chat 模式下图片常在**最后一个 chunk** 一次性返回
+</Callout>
+
+## 4.4 Responses API（新版 Agent）
+
+OpenAI 新一代响应接口，支持 Agent 工具调用等高级功能。
+
+```
+POST /v1/responses
+POST /v1/responses/compact
+```
+
+请求体格式遵循 OpenAI Responses API 规范，支持 SSE 流式响应。

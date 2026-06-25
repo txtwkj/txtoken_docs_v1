@@ -1,0 +1,216 @@
+---
+title: 常见集成场景
+description: Claude Code、OpenClaw、Hermes、LobeChat、LangChain
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+所有示例中需将 `<平台地址>` 和 `sk-xxxxxxxxxxxx` 替换为实际值。
+
+## 10.1 Claude Code
+
+Claude Code 通过 **Anthropic Messages API** 调用模型。本平台兼容 `POST /v1/messages`，需将请求路由到平台网关而非 Anthropic 官方地址。
+
+### 方式一：环境变量（当前终端会话）
+
+```bash
+export ANTHROPIC_BASE_URL="http://<平台地址>"
+export ANTHROPIC_AUTH_TOKEN="sk-xxxxxxxxxxxx"
+# 可选：从网关 /v1/models 自动发现模型（Claude Code v2.1.129+）
+export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
+```
+
+### 方式二：`~/.claude/settings.json`（推荐，对所有会话生效）
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://<平台地址>",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxxxxxx",
+    "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1"
+  }
+}
+```
+
+修改后**重启 Claude Code**（退出并重新运行 `claude`）。
+
+### 配置说明
+
+| 项 | 值 | 说明 |
+|---|---|---|
+| `ANTHROPIC_BASE_URL` | `http://<平台地址>` | 网关根地址；Claude Code 会请求 `{BASE_URL}/v1/messages` |
+| `ANTHROPIC_AUTH_TOKEN` | `sk-...` | 与 `ANTHROPIC_API_KEY` 二选一；平台 Key 可直接使用 |
+| 指定渠道 | `sk-...-<渠道ID>` | 写入 `ANTHROPIC_AUTH_TOKEN` 即可 |
+| 模型名 | 如 `claude-sonnet-4-20250514` | 在 Claude Code 内 `/model` 切换；须为平台已开通的 Claude 模型 |
+
+<Callout type="warn">
+- 网关须实现 **Anthropic `/v1/messages` 格式**；Claude Code **不能**仅用 OpenAI `/v1/chat/completions` 作为唯一入口。
+- 经非官方网关时，MCP tool search 默认关闭；若代理支持 `tool_reference`，可设 `ENABLE_TOOL_SEARCH=true`。
+- 若模型列表未自动刷新，在 Claude Code 中手动指定已在平台开通的模型 ID。
+</Callout>
+
+## 10.2 OpenClaw
+
+OpenClaw 支持在配置文件中添加 **OpenAI 兼容**或 **Anthropic 兼容**自定义 Provider，对接本平台。
+
+配置文件默认路径：`~/.openclaw/openclaw.json`。
+
+### OpenAI 兼容（Chat Completions）示例
+
+适用于平台已开通的 GPT、DeepSeek 等走 `/v1/chat/completions` 的模型：
+
+```json
+{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "cloudsky": {
+        "baseUrl": "http://<平台地址>/v1",
+        "apiKey": "${CLOUDSKY_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "gpt-4o",
+            "name": "GPT-4o",
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-chat",
+            "name": "DeepSeek Chat",
+            "contextWindow": 64000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agent": {
+    "model": "cloudsky/gpt-4o"
+  }
+}
+```
+
+### Anthropic 兼容（Messages）示例
+
+适用于 Claude 系列（走 `/v1/messages`）：
+
+```json
+{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "cloudsky-claude": {
+        "baseUrl": "http://<平台地址>",
+        "apiKey": "${CLOUDSKY_API_KEY}",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "claude-sonnet-4-20250514",
+            "name": "Claude Sonnet 4",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agent": {
+    "model": "cloudsky-claude/claude-sonnet-4-20250514"
+  }
+}
+```
+
+### 环境变量
+
+```bash
+export CLOUDSKY_API_KEY="sk-xxxxxxxxxxxx"
+```
+
+### 使用步骤
+
+1. 将上述片段合并进 `~/.openclaw/openclaw.json`（`models[].id` 须与平台模型名**完全一致**）。
+2. 重启 OpenClaw Gateway 或执行配置热加载（视安装方式而定）。
+3. 在 OpenClaw 中用 `/model` 或配置中的 `agent.model` 选择 `cloudsky/模型名`。
+4. 验证：`openclaw models list --provider cloudsky`（Provider 名以您配置为准）。
+
+<Callout type="info">
+- `baseUrl`：OpenAI 兼容 Provider 通常以 `/v1` 结尾；Anthropic 兼容 Provider 一般为**网关根地址**（不含 `/v1`），与 Claude Code 约定一致。
+- `api` 字段：`openai-completions` 或 `anthropic-messages`，须与所选协议匹配。
+</Callout>
+
+## 10.3 Hermes Agent
+
+Hermes Agent 支持任意实现 `/v1/chat/completions` 的 OpenAI 兼容端点，可指向本平台。
+
+### 方式一：交互配置（推荐）
+
+```bash
+export CLOUDSKY_API_KEY="sk-xxxxxxxxxxxx"
+hermes model
+```
+
+在向导中选择 **Custom endpoint (self-hosted / VLLM / etc.)**，填写：
+
+| 项 | 值 |
+|---|---|
+| API Base URL | `http://<平台地址>/v1` |
+| API Key | `sk-xxxxxxxxxxxx` |
+| Model name | 平台已开通模型，如 `gpt-4o`、`deepseek-chat` |
+
+配置会写入 `~/.hermes/config.yaml`。
+
+### 方式二：直接编辑 `~/.hermes/config.yaml`
+
+```yaml
+model:
+  default: gpt-4o
+  provider: custom
+  base_url: http://<平台地址>/v1
+  api_key: sk-xxxxxxxxxxxx
+```
+
+### 方式三：环境变量（辅助路由）
+
+在 `~/.hermes/.env` 中：
+
+```
+OPENAI_BASE_URL=http://<平台地址>/v1
+OPENAI_API_KEY=sk-xxxxxxxxxxxx
+```
+
+主模型路由以 `config.yaml` 为准；`OPENAI_BASE_URL` 主要作用于 `provider: main` 等辅助任务路径。
+
+### 多 Provider 别名（可选）
+
+```yaml
+custom_providers:
+  - name: cloudsky
+    base_url: http://<平台地址>/v1
+    api_key: sk-xxxxxxxxxxxx
+```
+
+会话中切换：`/model custom:cloudsky`，并在配置中指定 `default` 模型名。
+
+<Callout type="info">
+- Hermes 走 **OpenAI Chat Completions**，不能直接替代 Claude Code 的 Anthropic Messages 路径。
+- 指定渠道时 API Key 使用 `sk-<密钥>-<渠道ID>`。
+- 修改配置后重启 Hermes 或重新执行 `hermes model` 使配置生效。
+</Callout>
+
+## 10.4 LobeChat / NextChat
+
+- API 地址：`http://<平台地址>/v1`
+- API Key：`sk-xxxxxxxxxxxx`
+
+## 10.5 LangChain
+
+```python
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    base_url="http://<平台地址>/v1",
+    api_key="sk-xxxxxxxxxxxx",
+    model="gpt-4o",
+)
+```

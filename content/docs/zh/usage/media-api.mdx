@@ -1,0 +1,197 @@
+---
+title: 多媒体生成接口
+description: Seedance 视频、可灵、Midjourney、Suno 音乐
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 6.1 视频生成（通用）
+
+OpenAI Video 兼容任务接口，支持 Seedance、Sora 等模型。
+
+| 操作 | 方法 & 路径 | 说明 |
+|------|-----------|------|
+| 创建任务 | `POST /v1/videos` | 提交视频生成任务 |
+| 查询任务 | `GET /v1/videos/{task_id}` | 查询状态与结果 |
+
+兼容别名：
+
+- 创建：`POST /v1/video/generations`
+- 查询：`GET /v1/video/generations/{task_id}`
+
+## 6.2 Doubao Seedance 2.0 视频生成
+
+火山方舟 Seedance 2.0 通过 OpenAI Video 兼容形态接入。
+
+### 6.2.0 真人形象审核与资产库（合规前置）
+
+涉及真人肖像或私域虚拟人像素材时需要完成审核流程：
+
+| 序号 | 责任方 | 事项 |
+|------|--------|------|
+| 1 | 用户 | 提交 Seedance 2.0 接入需求 |
+| 2 | 管理员 | 创建私域虚拟人像素材资产库，交付资产库 ID |
+| 3 | 用户 | 在资产库内提交人物素材完成审核 |
+| 4 | 用户 | 使用已生效的资产 ID 调用平台 API 创建视频任务 |
+
+### 6.2.1 平台请求映射
+
+火山原生使用扁平 JSON，平台统一为：
+
+```json
+{
+  "model": "<模型 ID>",
+  "prompt": "<文本描述>",
+  "metadata": {
+    "<官方同名字段>": "...",
+    "content": [ /* ContentItem 数组 */ ]
+  }
+}
+```
+
+| 官方字段 | 平台位置 |
+|---------|---------|
+| `model` | 顶层 `model` |
+| `content[]` | `metadata.content` |
+| `generate_audio`、`ratio`、`duration`、`resolution` 等 | `metadata.*` 同名 |
+| 文本描述 | 顶层 `prompt`（必填） |
+
+### 6.2.2 模型 ID
+
+| 模型 ID | 说明 |
+|---------|------|
+| `doubao-seedance-2-0-260128` | 标准版；多模态参考、复杂分镜 |
+| `doubao-seedance-2-0-fast-260128` | 快速版，时延更低 |
+| `doubao-seedance-1-5-pro-251215` | 1.5 Pro；首帧/首尾帧场景 |
+
+### 6.2.3 三种互斥场景（必读）
+
+| 场景 | `metadata.content` 要点 | 推荐模型 |
+|------|------------------------|---------|
+| ① 首帧图生视频 | `text` + **1 条** `image_url`，**不写** `role` | 常为 1.5 Pro |
+| ② 多模态参考 | `text` + `reference_image` / `reference_video` / `reference_audio` | **2.0** |
+| ③ 首尾帧 | `text` + 2 条 `image_url`，`role`=`first_frame`/`last_frame` | 常为 1.5 Pro |
+
+<Callout type="error">
+三类**不可混用** `role`，否则易产生参数错误。
+</Callout>
+
+### 6.2.4 生成参数（`metadata`）
+
+| 字段 | 候选值 | 说明 |
+|------|--------|------|
+| `content` | array | 必填，见 §6.2.5 |
+| `generate_audio` | `true` / `false` | 同步音频；默认 `true` |
+| `ratio` | `16:9`、`4:3`、`1:1`、`3:4`、`9:16`、`21:9`、`adaptive` | 文生默认 `16:9`；图生默认 `adaptive` |
+| `duration` | 整数秒 | 与 `frames` 二选一；**2.0**：4–15s；**2.0 fast**：4–12s；默认约 **5** |
+| `frames` | `25+4n`，范围约 29–289 | 与 `duration` 二选一；同时存在时 frames 优先 |
+| `resolution` | `480p`、`720p`、`1080p` | 2.0 系列默认 720p；1.0 pro/fast 默认 1080p |
+| `watermark` | `true` / `false` | 默认 `false` |
+| `seed` | -1 ～ 2³²-1 | 默认 -1（随机） |
+| `camera_fixed` | `true` / `false` | 参考图场景不支持；2.0 暂不支持 |
+| `return_last_frame` | `true` / `false` | 为 true 时可查尾帧 PNG |
+| `draft` | `true` / `false` | **仅 1.5 pro** 样片模式（480p） |
+| `tools` | `[{"type":"web_search"}]` | **仅 2.0 / 2.0 fast** |
+| `service_tier` | `default` / `flex` | **2.0 不支持 flex** |
+| `execution_expires_after` | 3600–259200 | 默认 172800（48h） |
+| `callback_url` | HTTPS URL | 状态变更 POST 回调 |
+| `safety_identifier` | 长度 ≤64 的英文字符串 | 终端用户唯一标识 |
+
+**分辨率 × 画幅示例（2.0 系列）：**
+
+| resolution | ratio | 像素（示例） |
+|-----------|-------|-----------|
+| 480p | 16:9 | 864×480 |
+| 720p | 16:9 | 1248×704 |
+| 720p | 1:1 | 960×960 |
+
+### 6.2.5 `metadata.content[]`（ContentItem）
+
+| type | 必填字段 | role（候选） |
+|------|---------|------------|
+| `text` | `text` | — |
+| `image_url` | `image_url: {"url":"..."}` | 省略 / `first_frame` / `last_frame` / `reference_image` |
+| `video_url` | `video_url: {"url":"..."}` | `reference_video` |
+| `audio_url` | `audio_url: {"url":"..."}` | `reference_audio` |
+
+素材 URL 须**公网 HTTPS 可访问**。
+
+### 6.2.6 示例：多模态参考（Seedance 2.0）
+
+```bash
+curl -X POST "http://<平台地址>/v1/videos" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
+  -d '{
+    "model": "doubao-seedance-2-0-260128",
+    "prompt": "全程使用视频1的第一视角构图，全程使用音频1作为背景音乐。第一人称视角果茶宣传广告……",
+    "metadata": {
+      "generate_audio": true,
+      "ratio": "16:9",
+      "duration": 11,
+      "resolution": "720p",
+      "watermark": false,
+      "content": [
+        {"type": "text", "text": "全程使用视频1的第一视角构图……"},
+        {
+          "type": "image_url",
+          "image_url": {"url": "https://example.com/ref1.jpg"},
+          "role": "reference_image"
+        },
+        {
+          "type": "video_url",
+          "video_url": {"url": "https://example.com/ref.mp4"},
+          "role": "reference_video"
+        },
+        {
+          "type": "audio_url",
+          "audio_url": {"url": "https://example.com/bgm.mp3"},
+          "role": "reference_audio"
+        }
+      ]
+    }
+  }'
+```
+
+### 6.2.7 查询与轮询
+
+```bash
+curl "http://<平台地址>/v1/videos/<task_id>" \
+  -H "Authorization: Bearer sk-xxxxxxxxxxxx"
+```
+
+| 状态 | 含义 |
+|------|------|
+| `queued` / `in_progress` | 排队 / 生成中 |
+| `succeeded` / `completed` | 成功 |
+| `failed` / `cancelled` | 失败 / 取消 |
+
+建议间隔 **3–10 秒**轮询；成片 URL 常见位置：`content.video_url`、`metadata.url`、顶层 `video_url`。
+
+## 6.3 可灵 Kling
+
+| 操作 | 方法 & 路径 |
+|------|-----------|
+| 文生视频 | `POST /kling/v1/videos/text2video` |
+| 图生视频 | `POST /kling/v1/videos/image2video` |
+| 查询文生视频 | `GET /kling/v1/videos/text2video/:task_id` |
+| 查询图生视频 | `GET /kling/v1/videos/image2video/:task_id` |
+
+## 6.4 Midjourney
+
+| 操作 | 方法 & 路径 | 说明 |
+|------|-----------|------|
+| 绘图 | `POST /mj/submit/imagine` | 提交绘图任务 |
+| 变体 | `POST /mj/submit/change` | 变体 |
+| 混合 | `POST /mj/submit/blend` | 多图混合 |
+| 查询 | `GET /mj/task/:id/fetch` | 任务状态 |
+
+**速度模式：** 将 `/mj/` 替换为 `/:mode/mj/`（如 `/fast/mj/submit/imagine`）
+
+## 6.5 Suno 音乐
+
+| 操作 | 方法 & 路径 |
+|------|-----------|
+| 提交创作 | `POST /suno/submit/:action` |
+| 批量查询 | `POST /suno/fetch` |
+| 单曲查询 | `GET /suno/fetch/:id` |

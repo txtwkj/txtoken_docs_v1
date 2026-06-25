@@ -1,0 +1,99 @@
+---
+title: 使用说明
+description: 天下同网 平台使用指南
+---
+
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import {
+  UserPlus,
+  Zap,
+  KeyRound,
+  MessageSquare,
+  Globe,
+  Film,
+  Radio,
+  AlertTriangle,
+  Code,
+  Puzzle,
+  HelpCircle,
+  Table,
+} from 'lucide-react';
+
+## 概述
+
+本使用说明面向平台用户（开发者、业务系统对接方）及企业/团队账号管理员，帮助您快速接入和使用天下同网模型聚合平台。
+
+<Cards>
+  <Card
+    icon={<UserPlus />}
+    title="账号注册与令牌管理"
+    description="注册账号、创建 API 令牌并分发给团队成员。"
+    href="/docs/usage/account-tokens"
+  />
+  <Card
+    icon={<Zap />}
+    title="快速开始"
+    description="发起第一个 API 请求。"
+    href="/docs/usage/quickstart"
+  />
+  <Card
+    icon={<KeyRound />}
+    title="鉴权说明"
+    description="OpenAI / Anthropic / Gemini 三种认证方式。"
+    href="/docs/usage/authentication"
+  />
+  <Card
+    icon={<MessageSquare />}
+    title="核心接口（OpenAI 兼容）"
+    description="对话补全、图片生成、Responses API。"
+    href="/docs/usage/openai-api"
+  />
+  <Card
+    icon={<Globe />}
+    title="原生协议兼容接口"
+    description="Claude Messages、Gemini generateContent。"
+    href="/docs/usage/native-api"
+  />
+  <Card
+    icon={<Film />}
+    title="多媒体生成接口"
+    description="Seedance 视频、可灵、Midjourney、Suno。"
+    href="/docs/usage/media-api"
+  />
+  <Card
+    icon={<Radio />}
+    title="流式响应（SSE）说明"
+    description="Server-Sent Events 流式响应格式与示例。"
+    href="/docs/usage/streaming"
+  />
+  <Card
+    icon={<AlertTriangle />}
+    title="错误码参考"
+    description="HTTP 状态码与业务错误码。"
+    href="/docs/usage/error-codes"
+  />
+  <Card
+    icon={<Code />}
+    title="SDK 接入指南"
+    description="OpenAI SDK 快速配置。"
+    href="/docs/usage/sdk"
+  />
+  <Card
+    icon={<Puzzle />}
+    title="常见集成场景"
+    description="Claude Code、OpenClaw、Hermes、LobeChat、LangChain。"
+    href="/docs/usage/integrations"
+  />
+  <Card
+    icon={<HelpCircle />}
+    title="常见问题 FAQ"
+    description="常见错误与解决方案。"
+    href="/docs/usage/faq"
+  />
+  <Card
+    icon={<Table />}
+    title="附录：接口速查表"
+    description="全部接口路径汇总。"
+    href="/docs/usage/appendix"
+  />
+</Cards>

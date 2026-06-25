@@ -1,0 +1,37 @@
+---
+title: 鉴权说明
+description: 平台支持的多种协议风格身份验证
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+平台采用统一的 API Key 格式（`sk-xxxxx`），支持多种协议风格的身份验证。
+
+## 认证方式
+
+### OpenAI 风格（默认，用于大多数接口）
+
+```
+Authorization: Bearer sk-xxxxxxxxxxxx
+```
+
+### Anthropic/Claude 风格（用于 `/v1/messages`）
+
+```
+x-api-key: sk-xxxxxxxxxxxx
+anthropic-version: 2023-06-01
+```
+
+### Gemini 风格（用于 `/v1beta/models/*`）
+
+```
+x-goog-api-key: sk-xxxxxxxxxxxx
+```
+
+## 安全建议
+
+<Callout type="warn">
+- 避免在公开代码库或前端暴露密钥
+- 为不同环境使用独立凭证
+- 密钥泄露时迅速通知管理员进行轮换
+</Callout>

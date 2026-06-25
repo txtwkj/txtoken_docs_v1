@@ -1,0 +1,48 @@
+---
+title: 流式响应（SSE）说明
+description: Server-Sent Events 流式响应格式与示例
+---
+
+当请求中设置 `"stream": true` 时，服务器以 **Server-Sent Events (SSE)** 格式返回响应。
+
+## 7.1 响应格式
+
+```
+Content-Type: text/event-stream
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{"content":"你"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-abc","object":"chat.completion.chunk","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: [DONE]
+```
+
+**关键规则：**
+
+- 每行以 `data:` 开头，后跟 JSON
+- 流结束发送 `data: [DONE]`
+- 增量内容在 `choices[0].delta.content`
+- 携带 `stream_options.include_usage` 时，部分上游在流末返回 `usage`
+- 响应头可能含 `X-Reqid` / `X-Request-Id` 便于排障
+
+## 7.2 Gemini 流式
+
+```
+POST /v1beta/models/{model}:streamGenerateContent?alt=sse
+```
+
+## 7.3 Python 示例
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://<平台地址>/v1", api_key="sk-xxxxxxxxxxxx")
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "写一首关于春天的诗"}],
+    stream=True,
+)
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)
+```
