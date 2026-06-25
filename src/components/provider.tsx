@@ -3,12 +3,15 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { ReactNode } from 'react';
 
-export function Provider({
-  children,
-  locale,
-}: {
+interface ProviderProps {
   children: ReactNode;
-  locale?: Parameters<typeof RootProvider>[0]['locale'];
-}) {
-  return <RootProvider locale={locale}>{children}</RootProvider>;
+  locale?: { locale: string; translations: Record<string, string> };
+}
+
+export function Provider({ children, locale }: ProviderProps) {
+  return (
+    <RootProvider i18n={locale ? { locale: locale.locale, translations: locale.translations } : undefined}>
+      {children}
+    </RootProvider>
+  );
 }

@@ -13,28 +13,11 @@ const config = {
     // Static export requires unoptimized images.
     unoptimized: true,
   },
-  async headers() {
-    return [
-      {
-        // Apply charset to HTML pages
-        source: '/:lang(en|zh|ja)/:path*',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'text/html; charset=utf-8',
-          },
-        ],
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/:lang/docs/:path*.mdx',
-        destination: '/:lang/llms.mdx/:path*',
-      },
-    ];
-  },
+  // NOTE: 'headers' and 'rewrites' are not supported with output: 'export'.
+  // - Charset headers are redundant (static HTML already has charset meta).
+  // - LLM-friendly rewrites (/:lang/docs/*.mdx -> /:lang/llms.mdx/*) require
+  //   a runtime and do not work on GitHub Pages. If you re-enable them,
+  //   you must also remove output: 'export' (e.g. switch to Vercel).
 };
 
 export default withMDX(config);
