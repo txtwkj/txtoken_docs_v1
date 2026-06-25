@@ -51,11 +51,9 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          static_site_generator: next
-
+      # 'actions/configure-pages' is intentionally NOT used.
+      # We set output: 'export' in next.config.mjs directly. The auto-injector
+      # in v5 fails on this project's ESM config (withMDX wrapper + comments).
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
