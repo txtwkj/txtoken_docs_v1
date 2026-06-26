@@ -1,7 +1,6 @@
 import { source } from '@/lib/source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, linkItems } from '@/lib/layout.shared';
-import { ComplianceNotice } from '@/components/compliance-notice';
 import 'katex/dist/katex.min.css';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -31,7 +30,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         },
       }}
     >
-      <ComplianceNotice lang="zh" />
       {children}
     </DocsLayout>
   );
