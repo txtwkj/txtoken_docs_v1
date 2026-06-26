@@ -38,7 +38,7 @@ jobs:
         # Skip if you don't have the upstream HTTP source; the project already
         # ships a checked-in openapi/generated/ directory used by Fumadocs.
         run: |
-          if [ -f "./openapi/NewAPI.apifox.json" ]; then
+          if [ -f "./openapi/TxToken.apifox.json" ]; then
             bun run generate:openapi || echo "openapi generation skipped/failed, using checked-in files"
           else
             echo "no apifox source, using checked-in openapi/generated/"
