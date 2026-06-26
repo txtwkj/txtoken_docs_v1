@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "获取已完成视频任务的视频文件内容。\n\n此接口会代理返回视频文件流。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）/Sora格式"

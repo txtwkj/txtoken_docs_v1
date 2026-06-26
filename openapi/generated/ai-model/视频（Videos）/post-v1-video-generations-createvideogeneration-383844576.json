@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "提交视频生成任务，支持文生视频和图生视频。\n\n返回任务 ID，可通过 GET 接口查询任务状态。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）"

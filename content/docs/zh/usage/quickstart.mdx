@@ -7,7 +7,7 @@ description: 发起第一个 API 请求
 
 | 项目 | 值 | 说明 |
 |------|-----|------|
-| **Base URL** | `http://<平台地址>` | 所有 API 请求的根地址，由管理员提供 |
+| **Base URL** | `https://api.txtoken.cn` | 所有 API 请求的根地址，由管理员提供 |
 | **API Key** | `sk-xxxxxxxxxxxx` | 您的专属密钥；由管理员创建后分发，创建方法见 [账号注册与令牌管理](/docs/usage/account-tokens) |
 
 可选：固定走某一上游渠道时，Authorization 可使用 `Bearer sk-<密钥>-<渠道ID>`（以平台运营配置为准）。
@@ -15,7 +15,7 @@ description: 发起第一个 API 请求
 ## 2.2 发起第一个请求
 
 ```bash
-curl http://<平台地址>/v1/chat/completions \
+curl https://api.txtoken.cn/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{

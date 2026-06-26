@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "使用 Kling 模型从文本描述生成视频。\n\n支持的模型：kling-v1, kling-v1-5 等\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）/可灵格式"

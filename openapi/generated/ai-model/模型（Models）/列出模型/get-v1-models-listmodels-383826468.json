@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "获取当前可用的模型列表。\n\n根据请求头自动识别返回格式：\n- 包含 `x-api-key` 和 `anthropic-version` 头时返回 Anthropic 格式\n- 包含 `x-goog-api-key` 头或 `key` 查询参数时返回 Gemini 格式\n- 其他情况返回 OpenAI 格式\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "模型（Models）/列出模型"

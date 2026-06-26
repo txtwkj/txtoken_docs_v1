@@ -1,4 +1,6 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
+
+const DEFAULT_SERVER_URL = 'https://api.txtoken.cn';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
@@ -528,7 +530,7 @@ async function main() {
         version: '1.0.0',
         description: ep.description || undefined,
       },
-      tags: tags.map((name) => ({ name })),
+      servers: [{ url: DEFAULT_SERVER_URL }],
       ...(sec.securitySchemes
         ? { components: { securitySchemes: sec.securitySchemes } }
         : {}),

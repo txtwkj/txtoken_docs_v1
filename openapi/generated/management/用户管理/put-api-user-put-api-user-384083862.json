@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "👨‍💼 需要管理员权限（Admin）"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "用户管理"

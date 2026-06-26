@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "OpenAI Responses API，用于创建模型响应。\n支持多轮对话、工具调用、推理等功能。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "聊天（Chat）/原生OpenAI格式"

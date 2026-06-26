@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "🔓 无需鉴权（通过令牌查询）"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "日志"

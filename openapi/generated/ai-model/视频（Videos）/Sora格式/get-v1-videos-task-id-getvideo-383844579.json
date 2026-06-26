@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "OpenAI 兼容的视频任务状态查询接口。\n\n返回视频任务的详细状态信息。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）/Sora格式"

@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "使用指定引擎/模型创建嵌入"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "嵌入（Embeddings）"

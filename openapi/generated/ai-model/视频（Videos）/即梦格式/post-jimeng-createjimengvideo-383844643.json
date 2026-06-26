@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "即梦官方 API 格式的视频生成接口。\n\n支持通过 Action 参数指定操作类型：\n- `CVSync2AsyncSubmitTask`: 提交视频生成任务\n- `CVSync2AsyncGetResult`: 获取任务结果\n\n需要在查询参数中指定 Action 和 Version。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）/即梦格式"

@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "查询 Kling 图生视频任务的状态和结果。"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "视频（Videos）/可灵格式"

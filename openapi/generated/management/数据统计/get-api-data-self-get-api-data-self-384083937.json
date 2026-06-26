@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "🔐 需要登录（User权限）"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "数据统计"

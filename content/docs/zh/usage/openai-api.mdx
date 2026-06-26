@@ -27,7 +27,7 @@ POST /v1/chat/completions
 **curl 示例：**
 
 ```bash
-curl http://<平台地址>/v1/chat/completions \
+curl https://api.txtoken.cn/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -44,7 +44,7 @@ curl http://<平台地址>/v1/chat/completions \
 **流式请求示例：**
 
 ```bash
-curl -N http://<平台地址>/v1/chat/completions \
+curl -N https://api.txtoken.cn/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -126,7 +126,7 @@ OpenAI 兼容文生图模型，通过 `POST /v1/images/generations` 调用。
 | `background` | string | 否 | `transparent` / `opaque` / `auto` | 背景模式；默认常用 `transparent` |
 
 ```bash
-curl http://<平台地址>/v1/images/generations \
+curl https://api.txtoken.cn/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -186,7 +186,7 @@ POST /v1/images/generations
 | `auto` | 模型自选 |
 
 ```bash
-curl http://<平台地址>/v1/images/generations \
+curl https://api.txtoken.cn/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -215,7 +215,7 @@ Content-Type: multipart/form-data
 | `size` / `quality` / `output_format` 等 | — | 否 | 与文生图相同 |
 
 ```bash
-curl http://<平台地址>/v1/images/edits \
+curl https://api.txtoken.cn/v1/images/edits \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -F "model=gpt-image-2" \
   -F "prompt=在画面中加入一只橘猫，保持原有光线与构图" \
@@ -241,7 +241,7 @@ POST /v1/chat/completions
 平台会为支持生图的 Gemini 模型注入 `responseModalities`。建议 `max_tokens` 设为 **4096–8192**（图片 inline 数据较大）。
 
 ```bash
-curl http://<平台地址>/v1/chat/completions \
+curl https://api.txtoken.cn/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -281,7 +281,7 @@ POST /v1beta/models/{model}:generateContent
 **文生图 curl 示例（4K）：**
 
 ```bash
-curl "http://<平台地址>/v1beta/models/gemini-3.1-flash-image-preview:generateContent" \
+curl "https://api.txtoken.cn/v1beta/models/gemini-3.1-flash-image-preview:generateContent" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{
@@ -303,7 +303,7 @@ curl "http://<平台地址>/v1beta/models/gemini-3.1-flash-image-preview:generat
 **带参考图（inlineData）：**
 
 ```bash
-curl "http://<平台地址>/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+curl "https://api.txtoken.cn/v1beta/models/gemini-3-pro-image-preview:generateContent" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-xxxxxxxxxxxx" \
   -d '{

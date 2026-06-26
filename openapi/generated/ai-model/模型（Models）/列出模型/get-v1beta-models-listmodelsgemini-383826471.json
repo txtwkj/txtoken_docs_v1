@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "以 Gemini API 格式返回可用模型列表"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "模型（Models）/列出模型"

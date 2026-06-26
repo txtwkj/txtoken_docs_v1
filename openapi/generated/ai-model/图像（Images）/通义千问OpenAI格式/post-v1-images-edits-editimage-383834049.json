@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": " 百炼qwen-image系列图片编辑"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "图像（Images）/通义千问OpenAI格式"

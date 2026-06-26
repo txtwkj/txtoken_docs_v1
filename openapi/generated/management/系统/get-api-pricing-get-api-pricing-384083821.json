@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "🔓 无需鉴权（可选登录）"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "系统"

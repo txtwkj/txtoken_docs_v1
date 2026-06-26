@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "Gemini 图片生成"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "图像（Images）/原生Gemini格式"

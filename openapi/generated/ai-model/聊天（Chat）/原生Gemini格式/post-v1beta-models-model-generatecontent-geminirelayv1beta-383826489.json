@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "代理 Gemini API 请求。\n路径格式: `/v1beta/models/{model_name}:{action}`\n\n例如:\n- `/v1beta/models/gemini-2.5-pro:generateContent`\n- `/v1beta/models/gemini-2.5-pro:streamGenerateContent?alt=sse`\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "聊天（Chat）/原生Gemini格式"

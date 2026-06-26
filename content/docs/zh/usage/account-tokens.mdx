@@ -94,11 +94,11 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 ```
 【天下同网模型 API — 开发环境】
-Base URL：http://<平台地址>/v1
+Base URL：https://api.txtoken.cn/v1
 API Key：sk-xxxxxxxxxxxxxxxx（请勿外传）
 
 示例（curl）：
-curl http://<平台地址>/v1/chat/completions \
+curl https://api.txtoken.cn/v1/chat/completions \
   -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{"model":"gpt-4o-mini","messages":[{"role":"user","content":"你好"}]}'
@@ -115,7 +115,7 @@ curl http://<平台地址>/v1/chat/completions \
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://<平台地址>/v1",
+    base_url="https://api.txtoken.cn/v1",
     api_key="sk-xxxxxxxxxxxxxxxx",  # 管理员分发的 Key
 )
 

@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "将文本转换为向量嵌入"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "嵌入（Embeddings）"

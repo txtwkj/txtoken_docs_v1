@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "Anthropic Claude Messages API 格式的请求。\n需要在请求头中包含 `anthropic-version`。\n"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "聊天（Chat）"

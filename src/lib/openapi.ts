@@ -2,6 +2,8 @@ import { createOpenAPI } from 'fumadocs-openapi/server';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+const DEFAULT_SERVER_URL = 'https://api.txtoken.cn';
+
 async function walkJsonFiles(dir: string): Promise<string[]> {
   const out: string[] = [];
   async function walk(current: string) {
@@ -39,7 +41,14 @@ export const openapi = createOpenAPI({
     const entries = await Promise.all(
       files.map(async (p) => {
         const raw = await readFile(p, 'utf8');
-        return [p, JSON.parse(raw)] as const;
+        const spec = JSON.parse(raw) as { servers?: unknown[] } & Record<string, unknown>;
+        // Inject default `servers` block so Scalar/curl examples use the
+        // production base URL instead of the `https://loading` placeholder.
+        // Preserves any user-defined servers if present.
+        if (!Array.isArray(spec.servers) || spec.servers.length === 0) {
+          spec.servers = [{ url: DEFAULT_SERVER_URL }];
+        }
+        return [p, spec] as const;
       })
     );
     return Object.fromEntries(entries);

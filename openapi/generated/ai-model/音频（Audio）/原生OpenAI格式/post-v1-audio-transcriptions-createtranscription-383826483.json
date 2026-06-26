@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "将音频转换为文本"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "音频（Audio）/原生OpenAI格式"

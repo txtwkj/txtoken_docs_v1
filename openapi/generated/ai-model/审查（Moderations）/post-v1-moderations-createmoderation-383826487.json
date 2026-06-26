@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "description": "检查文本内容是否违反使用政策"
   },
+  "servers": [
+    {
+      "url": "https://api.txtoken.cn"
+    }
+  ],
   "tags": [
     {
       "name": "审查（Moderations）"

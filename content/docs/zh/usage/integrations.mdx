@@ -5,7 +5,7 @@ description: Claude Code、OpenClaw、Hermes、LobeChat、LangChain
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-所有示例中需将 `<平台地址>` 和 `sk-xxxxxxxxxxxx` 替换为实际值。
+所有示例中需将 `api.txtoken.cn` 和 `sk-xxxxxxxxxxxx` 替换为实际值。
 
 ## 10.1 Claude Code
 
@@ -14,7 +14,7 @@ Claude Code 通过 **Anthropic Messages API** 调用模型。本平台兼容 `PO
 ### 方式一：环境变量（当前终端会话）
 
 ```bash
-export ANTHROPIC_BASE_URL="http://<平台地址>"
+export ANTHROPIC_BASE_URL="https://api.txtoken.cn"
 export ANTHROPIC_AUTH_TOKEN="sk-xxxxxxxxxxxx"
 # 可选：从网关 /v1/models 自动发现模型（Claude Code v2.1.129+）
 export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
@@ -25,7 +25,7 @@ export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
 ```json
 {
   "env": {
-    "ANTHROPIC_BASE_URL": "http://<平台地址>",
+    "ANTHROPIC_BASE_URL": "https://api.txtoken.cn",
     "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxxxxxx",
     "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1"
   }
@@ -38,7 +38,7 @@ export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1
 
 | 项 | 值 | 说明 |
 |---|---|---|
-| `ANTHROPIC_BASE_URL` | `http://<平台地址>` | 网关根地址；Claude Code 会请求 `{BASE_URL}/v1/messages` |
+| `ANTHROPIC_BASE_URL` | `https://api.txtoken.cn` | 网关根地址；Claude Code 会请求 `{BASE_URL}/v1/messages` |
 | `ANTHROPIC_AUTH_TOKEN` | `sk-...` | 与 `ANTHROPIC_API_KEY` 二选一；平台 Key 可直接使用 |
 | 指定渠道 | `sk-...-<渠道ID>` | 写入 `ANTHROPIC_AUTH_TOKEN` 即可 |
 | 模型名 | 如 `claude-sonnet-4-20250514` | 在 Claude Code 内 `/model` 切换；须为平台已开通的 Claude 模型 |
@@ -65,7 +65,7 @@ OpenClaw 支持在配置文件中添加 **OpenAI 兼容**或 **Anthropic 兼容*
     "mode": "merge",
     "providers": {
       "cloudsky": {
-        "baseUrl": "http://<平台地址>/v1",
+        "baseUrl": "https://api.txtoken.cn/v1",
         "apiKey": "${CLOUDSKY_API_KEY}",
         "api": "openai-completions",
         "models": [
@@ -101,7 +101,7 @@ OpenClaw 支持在配置文件中添加 **OpenAI 兼容**或 **Anthropic 兼容*
     "mode": "merge",
     "providers": {
       "cloudsky-claude": {
-        "baseUrl": "http://<平台地址>",
+        "baseUrl": "https://api.txtoken.cn",
         "apiKey": "${CLOUDSKY_API_KEY}",
         "api": "anthropic-messages",
         "models": [
@@ -154,7 +154,7 @@ hermes model
 
 | 项 | 值 |
 |---|---|
-| API Base URL | `http://<平台地址>/v1` |
+| API Base URL | `https://api.txtoken.cn/v1` |
 | API Key | `sk-xxxxxxxxxxxx` |
 | Model name | 平台已开通模型，如 `gpt-4o`、`deepseek-chat` |
 
@@ -166,7 +166,7 @@ hermes model
 model:
   default: gpt-4o
   provider: custom
-  base_url: http://<平台地址>/v1
+  base_url: https://api.txtoken.cn/v1
   api_key: sk-xxxxxxxxxxxx
 ```
 
@@ -175,7 +175,7 @@ model:
 在 `~/.hermes/.env` 中：
 
 ```
-OPENAI_BASE_URL=http://<平台地址>/v1
+OPENAI_BASE_URL=https://api.txtoken.cn/v1
 OPENAI_API_KEY=sk-xxxxxxxxxxxx
 ```
 
@@ -186,7 +186,7 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxx
 ```yaml
 custom_providers:
   - name: cloudsky
-    base_url: http://<平台地址>/v1
+    base_url: https://api.txtoken.cn/v1
     api_key: sk-xxxxxxxxxxxx
 ```
 
@@ -200,7 +200,7 @@ custom_providers:
 
 ## 10.4 LobeChat / NextChat
 
-- API 地址：`http://<平台地址>/v1`
+- API 地址：`https://api.txtoken.cn/v1`
 - API Key：`sk-xxxxxxxxxxxx`
 
 ## 10.5 LangChain
@@ -209,7 +209,7 @@ custom_providers:
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    base_url="http://<平台地址>/v1",
+    base_url="https://api.txtoken.cn/v1",
     api_key="sk-xxxxxxxxxxxx",
     model="gpt-4o",
 )
