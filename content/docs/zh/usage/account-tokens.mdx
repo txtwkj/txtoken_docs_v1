@@ -71,7 +71,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 | **新建数量** | `1`；批量建测试 Key 可填 `5` 等 | 批量创建时名称会自动加随机后缀 |
 | **无限额度** | 开发可开；生产建议 **关闭** 并设令牌上限 | 令牌额度 ≤ 账户剩余额度 |
 | **金额 / 额度** | 如为李四分配等价 $50 的额度 | 用尽后该 Key 不可用，账户有余额也不透支该 Key |
-| **模型限制列表** | 生产 Agent 可只勾选 `gpt-4o`、`kimi-k2.5` | 留空表示允许账户可用的全部模型 |
+| **模型限制列表** | 生产 Agent 可只勾选 `qwen3-max`、`kimi-k2.5` | 留空表示允许账户可用的全部模型 |
 | **IP 白名单** | 生产服务填 office 出口 IP 或 K8s 网段 | 一行一个；留空不限制（需配合网关加固） |
 
 4. 点击 **提交**。提示「令牌创建成功，请在列表页面点击复制获取令牌」。
@@ -86,7 +86,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 | 名称 | 分组 | 过期 | 额度 | 模型限制 | 交给 |
 |------|------|------|------|---------|------|
 | `dev-backend-li4` | `default` | 30 天 | 无限（受账户余额约束） | 无 | 李四 |
-| `qa-automation-wang5` | `default` | 30 天 | 等价 $20 | 仅 `gpt-4o-mini` | 王五 |
+| `qa-automation-wang5` | `default` | 30 天 | 等价 $20 | 仅 `qwen-plus` | 王五 |
 
 ## 1.4 将令牌分发给员工
 
@@ -101,7 +101,7 @@ API Key：sk-xxxxxxxxxxxxxxxx（请勿外传）
 curl https://api.txtoken.cn/v1/chat/completions \
   -H "Authorization: Bearer sk-xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
-  -d '{"model":"gpt-4o-mini","messages":[{"role":"user","content":"你好"}]}'
+  -d '{"model":"qwen-plus","messages":[{"role":"user","content":"你好"}]}'
 
 注意：
 1. Key 只用于服务端或受信环境，不要写进前端仓库；
@@ -120,7 +120,7 @@ client = OpenAI(
 )
 
 resp = client.chat.completions.create(
-    model="gpt-4o-mini",
+    model="qwen-plus",
     messages=[{"role": "user", "content": "你好"}],
 )
 print(resp.choices[0].message.content)

@@ -12,20 +12,20 @@ description: 常见错误与解决方案
 
 ### Q2：403 模型不可用？
 
-Key 可能配置了模型白名单，请联系管理员开通对应模型（如 `gpt-image-2`、`doubao-seedance-2-0-260128`）。
+Key 可能配置了模型白名单，请联系管理员开通对应模型（如 `qwen-image-2.0`、`doubao-seedance-2-0-260128`）。
 
 ### Q3：429 限流？
 
-- 降低并发（尤其 gpt-image-2 `quality=high`、Gemini 4K、Seedance 视频）
+- 降低并发（尤其 qwen-image-2.0 `quality=high`、多模态生图 4K、Seedance 视频）
 - 增加请求间隔与 HTTP 超时
 
 ### Q4：图片接口 400 `unknown_parameter`？
 
 多数网关**不支持** `response_format`，请从请求体移除；Gemini 勿传 `imageOutputOptions` 除非渠道明确支持。
 
-### Q5：gpt-image-2 传 `background: transparent` 失败？
+### Q5：qwen-image-2.0 传 `background: transparent` 失败？
 
-**gpt-image-2 不支持透明背景**，请使用 `opaque` 或 `auto`，输出格式选 `png`/`webp`。
+**qwen-image-2.0 不支持透明背景**，请使用 `opaque` 或 `auto`，输出格式选 `png`/`webp`。
 
 ### Q6：Gemini 生图长时间无响应？
 
