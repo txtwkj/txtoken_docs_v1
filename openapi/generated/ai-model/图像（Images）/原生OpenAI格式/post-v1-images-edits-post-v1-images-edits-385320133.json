@@ -94,7 +94,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "dall-e-2"
+                      "qwen-image-base"
                     ]
                   }
                 },

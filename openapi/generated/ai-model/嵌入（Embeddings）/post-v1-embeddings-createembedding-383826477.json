@@ -48,7 +48,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "text-embedding-ada-002"
+                      "qwen3-embedding"
                     ]
                   },
                   "input": {

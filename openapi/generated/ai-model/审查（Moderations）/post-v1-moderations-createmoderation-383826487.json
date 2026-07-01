@@ -60,7 +60,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "text-moderation-latest"
+                      "qwen-safety"
                     ]
                   }
                 },

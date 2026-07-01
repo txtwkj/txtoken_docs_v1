@@ -71,7 +71,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "claude-3-opus-20240229"
+                      "kimi-k2"
                     ]
                   },
                   "messages": {
