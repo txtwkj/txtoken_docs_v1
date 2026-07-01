@@ -3,7 +3,7 @@
   "info": {
     "title": "原生OpenAI格式",
     "version": "1.0.0",
-    "description": "建立 WebSocket 连接用于实时对话。\n\n**注意**: 这是一个 WebSocket 端点，需要使用 WebSocket 协议连接。\n\n连接 URL 示例: `wss://api.example.com/v1/realtime?model=gpt-4o-realtime`\n"
+    "description": "建立 WebSocket 连接用于实时对话。\n\n**注意**: 这是一个 WebSocket 端点，需要使用 WebSocket 协议连接。\n\n连接 URL 示例: `wss://api.example.com/v1/realtime?model=qwen-omni-realtime`\n"
   },
   "servers": [
     {
@@ -31,7 +31,7 @@
           "实时语音（Realtime）"
         ],
         "summary": "原生OpenAI格式",
-        "description": "建立 WebSocket 连接用于实时对话。\n\n**注意**: 这是一个 WebSocket 端点，需要使用 WebSocket 协议连接。\n\n连接 URL 示例: `wss://api.example.com/v1/realtime?model=gpt-4o-realtime`\n",
+        "description": "建立 WebSocket 连接用于实时对话。\n\n**注意**: 这是一个 WebSocket 端点，需要使用 WebSocket 协议连接。\n\n连接 URL 示例: `wss://api.example.com/v1/realtime?model=qwen-omni-realtime`\n",
         "operationId": "createrealtimesession",
         "parameters": [
           {
@@ -42,7 +42,7 @@
             "schema": {
               "type": "string",
               "examples": [
-                "gpt-4o-realtime-preview"
+                "qwen-omni-realtime"
               ]
             }
           }

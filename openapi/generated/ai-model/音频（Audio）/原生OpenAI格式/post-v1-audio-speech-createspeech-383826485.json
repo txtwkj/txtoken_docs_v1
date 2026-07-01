@@ -49,7 +49,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "tts-1"
+                      "qwen-tts"
                     ]
                   },
                   "input": {

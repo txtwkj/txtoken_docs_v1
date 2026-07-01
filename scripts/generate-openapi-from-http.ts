@@ -4,6 +4,127 @@ const DEFAULT_SERVER_URL = 'https://api.txtoken.cn';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 
+/**
+ * Foreign → domestic model identifier rewrite map.
+ *
+ * Scope: ONLY applied to
+ *   (a) bare string values that look like model identifiers (see
+ *       `looksLikeModelId` — short, lowercase alphanum + `-_.`, no Chinese /
+ *       whitespace / punctuation), and
+ *   (b) `?model=<id>` / `&model=<id>` query parameters inside any string
+ *       (covers WSS / HTTPS URLs in descriptions and examples).
+ *
+ * NOT applied to free-form prose inside `description` / `summary` fields
+ * (e.g. "可使用 gemini-2.5-flash-preview-tts 等模型" or
+ * "用于图像生成的模型。`dall-e-2`、`dall-e-3` 或 `gpt-image-1` 之一" stays as-is)
+ * — that's intentional: prose that distinguishes between sibling models
+ * would lose semantic info if blindly rewritten.
+ *
+ * Keys are sorted longest-first inside `renameId` to avoid prefix collisions
+ * (e.g. `gpt-image-2-2026-04-21` before `gpt-image-2`).
+ *
+ * Vendor / protocol / tag strings (e.g. "OpenAI", "原生OpenAI格式",
+ * "Sora格式", "/v1/chat/completions") are NOT rewritten because they don't
+ * match any key.
+ */
+const MODEL_RENAME_MAP: ReadonlyArray<readonly [string, string]> = [
+  // OpenAI — chat 旗舰 / 轻量 / 实时
+  ['gpt-5.4', 'qwen3-max'],
+  ['gpt-4o-mini', 'qwen-plus'],
+  ['gpt-4o-realtime-preview', 'qwen-omni-realtime'],
+  ['gpt-4o-realtime', 'qwen-omni-realtime'],
+  ['gpt-4o', 'qwen3-max'],
+  ['gpt-4', 'qwen3-max'],
+  // OpenAI — image（保留 3 档区分：base / 旗舰 / pro）
+  ['gpt-image-2-2026-04-21', 'qwen-image-2.0-2025-snapshot'],
+  ['gpt-image-2', 'qwen-image-2.0'],
+  ['gpt-image-1.5', 'qwen-image'],
+  ['gpt-image-1', 'qwen-image-pro'],
+  ['dall-e-3', 'qwen-image-2.0'],
+  ['dall-e-2', 'qwen-image-base'],
+  // Anthropic
+  ['claude-3-opus-20240229', 'kimi-k2'],
+  ['claude-sonnet-4-20250514', 'kimi-k2'],
+  ['claude-opus-4.6', 'glm-4.6'],
+  // Google — multimodal / vision
+  ['gemini-2.5-pro', 'qwen3-vl-plus'],
+  ['gemini-2.5-flash-preview-tts', 'qwen-omni-tts'],
+  ['gemini-2.5-flash-image', 'qwen-image'],
+  ['gemini-3-pro-image-preview', 'qwen-image-2.0'],
+  ['gemini-3.1-flash-image-preview', 'qwen-image'],
+  ['gemini-2.0-flash-exp-image-generation', 'qwen-image'],
+  // OpenAI — audio
+  ['whisper-1', 'qwen-asr'],
+  ['tts-1', 'qwen-tts'],
+  // OpenAI — video
+  ['sora-2', 'doubao-seedance'],
+  ['sora', 'doubao-seedance'],
+  // OpenAI — embedding / moderation / rerank
+  ['text-embedding-ada-002', 'qwen3-embedding'],
+  ['text-moderation-latest', 'qwen-safety'],
+  // Cohere — rerank
+  ['rerank-english-v2.0', 'qwen-rerank'],
+];
+
+/**
+ * Pre-sorted by key length descending so longer identifiers are matched first
+ * (prevents `gpt-image-2` from greedily eating the prefix of
+ * `gpt-image-2-2026-04-21`).
+ */
+const SORTED_RENAMES = [...MODEL_RENAME_MAP].sort(
+  (a, b) => b[0].length - a[0].length
+);
+
+/**
+ * Heuristic: a "bare" model id is short, only `[a-z0-9._-]`, no whitespace
+ * or Chinese / punctuation. Strings that fail this (e.g. URLs, prose) are
+ * treated more carefully (see `rewriteStringValue`).
+ */
+const BARE_ID = /^[a-z0-9._-]+$/;
+
+/** True iff `s` looks like a model identifier that should be fully rewritten. */
+function looksLikeModelId(s: string): boolean {
+  return s.length > 0 && s.length <= 60 && BARE_ID.test(s);
+}
+
+/** Apply the rename map (longest-key-first) to a single string. */
+function renameId(s: string): string {
+  let out = s;
+  for (const [from, to] of SORTED_RENAMES) {
+    if (out.includes(from)) out = out.split(from).join(to);
+  }
+  return out;
+}
+
+/**
+ * Rewrite a single string value:
+ *   - if it looks like a bare model id, apply the rename map wholesale;
+ *   - otherwise, only touch `?model=<id>` / `&model=<id>` query parameters
+ *     (covers WSS / HTTPS URLs in descriptions), and leave the rest alone.
+ */
+function rewriteStringValue(s: string): string {
+  if (looksLikeModelId(s)) return renameId(s);
+  // Non-bare: only rewrite the value of a `model=<id>` query param.
+  return s.replace(/([?&]model=)([a-z0-9._-]+)/g, (_m, prefix, id) => {
+    const rewritten = renameId(id);
+    return prefix + rewritten;
+  });
+}
+
+/** Recursively walk a JSON-compatible value, rewriting foreign model ids. */
+function rewriteModelNames(value: unknown): unknown {
+  if (typeof value === 'string') return rewriteStringValue(value);
+  if (Array.isArray(value)) return value.map(rewriteModelNames);
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = rewriteModelNames(v);
+    }
+    return out;
+  }
+  return value;
+}
+
 type HttpTxtRoot = {
   success: boolean;
   data: HttpEndpoint[];
@@ -531,6 +652,7 @@ async function main() {
         description: ep.description || undefined,
       },
       servers: [{ url: DEFAULT_SERVER_URL }],
+      tags: [{ name: tags[0] }],
       ...(sec.securitySchemes
         ? { components: { securitySchemes: sec.securitySchemes } }
         : {}),
@@ -565,7 +687,11 @@ async function main() {
       },
     };
 
-    await writeFile(outFile, JSON.stringify(doc, null, 2), 'utf8');
+    await writeFile(
+      outFile,
+      JSON.stringify(rewriteModelNames(doc), null, 2) + '\n',
+      'utf8'
+    );
     count++;
   }
 

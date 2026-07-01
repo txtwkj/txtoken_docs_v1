@@ -14,11 +14,11 @@ client = OpenAI(
 )
 
 # 对话
-client.chat.completions.create(model="gpt-4o", messages=[...])
+client.chat.completions.create(model="qwen3-max", messages=[...])
 
-# gpt-image-1.5 / gpt-image-2 文生图
+# qwen-image / qwen-image-2.0 文生图
 client.images.generate(
-    model="gpt-image-1.5",
+    model="qwen-image",
     prompt="A cute otter",
     size="1024x1024",
     extra_body={"background": "transparent"},

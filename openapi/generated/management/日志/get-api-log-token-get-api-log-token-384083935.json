@@ -24,16 +24,7 @@
         "summary": "通过令牌获取日志",
         "description": "🔓 无需鉴权（通过令牌查询）",
         "operationId": "get-api-log-token",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "成功"

@@ -21,7 +21,7 @@ curl https://api.txtoken.cn/v1/messages \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "claude-sonnet-4-20250514",
+    "model": "kimi-k2",
     "max_tokens": 1024,
     "messages": [
       {"role": "user", "content": "用 Python 写一个快速排序"}
@@ -40,4 +40,4 @@ curl https://api.txtoken.cn/v1/messages \
 - 请求头：`Authorization: Bearer sk-xxxxxxxxxxxx`
 - URL 参数：`?key=sk-xxxxxxxxxxxx`
 
-Gemini 图片生成参数详见[核心接口 §4.3.4](/docs/usage/openai-api#434-gemini-图片生成)。
+多模态图片生成参数详见[核心接口 §4.3.4](/docs/usage/openai-api#434-多模态生图)。

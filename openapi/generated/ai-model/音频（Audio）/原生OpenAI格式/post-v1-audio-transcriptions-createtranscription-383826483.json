@@ -49,7 +49,7 @@
                   "model": {
                     "type": "string",
                     "examples": [
-                      "whisper-1"
+                      "qwen-asr"
                     ]
                   },
                   "language": {

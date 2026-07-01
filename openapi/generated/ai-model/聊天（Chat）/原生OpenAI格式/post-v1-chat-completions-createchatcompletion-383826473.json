@@ -49,7 +49,7 @@
                     "type": "string",
                     "description": "模型 ID",
                     "examples": [
-                      "gpt-4"
+                      "qwen3-max"
                     ]
                   },
                   "messages": {

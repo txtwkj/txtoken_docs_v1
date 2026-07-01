@@ -175,7 +175,7 @@ async function getSchemaInputs(
 
 async function writeMetaJson(dir: string, meta: Record<string, unknown>) {
   const metaPath = path.join(dir, 'meta.json');
-  await writeFile(metaPath, JSON.stringify(meta, null, 2), 'utf8');
+  await writeFile(metaPath, JSON.stringify(meta, null, 2) + '\n', 'utf8');
 }
 
 async function ensureFileFromTemplate(destPath: string, templatePath: string) {
